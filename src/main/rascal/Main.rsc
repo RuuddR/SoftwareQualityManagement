@@ -1,21 +1,54 @@
-module Main
+module Figures
 
-import IO;
+import analysis::graphs::Graph;
+import Relation;
+import vis::Figure;
+import vis::Render;
 
-import lang::java::m3::Core;
+// voorbeeld 1: graaf visualisatie
 
-M3 smallSqlModel = createM3FromDirectory(|project://SoftwareQualityManagement/smallsql/|);
-M3 hsqldbModel = createM3FromDirectory(|project://SoftwareQualityManagement/hsqldb/|);
+public Graph[str] mygraph =
+   { <"A", "B">, <"A", "D">, <"B", "D">
+   , <"B", "E">, <"C", "B">, <"C", "E">, <"C", "F">
+   , <"E", "D">, <"E", "F">
+   };
 
-int main(int testArgument=0) {
-    println("argument: <testArgument>");
-    return testArgument;
+public Figure showGraph(Graph[str] g) {
+   nodes = [ box(text(s), id(s), size(60), fillColor("yellow"))
+           | s <- carrier(g)
+           ];
+   edges = [ edge(a, b, toArrow(ellipse(size(10))))
+           | <a, b> <- g
+           ];
+   return graph(nodes, edges, hint("layered"), gap(50));
 }
 
-M3 getSmallSqlModel() {
-    return smallSqlModel;
+public void fig1() {
+   render(showGraph(mygraph));
 }
 
-M3 getHsqldbModel() {
-    return hsqldbModel;
+// voorbeeld 2: mouse over
+
+public FProperty popup(str S) =
+   mouseOver(box(text(S), fillColor("lightyellow"),grow(1.2),resizable(false)));
+
+public void fig2() {
+   render(box(size(50),fillColor("red"), shrink(0.5), popup("Hello")));
+}
+
+// voorbeeld 3: sliders and interaction
+
+public Figure scaledbox() {
+   int n = 100;
+   Figure mySlider = scaleSlider(
+      int () { return 0; }, // callback laagste waarde
+      int () { return 200; }, // callback hoogste waarde
+      int () { return n; }, // callback huidige selectie
+      void (int s) { n = s; }, // callback bij verandering
+      width(200));
+   Figure myText = text(str () { return "n: <n>";});
+   Figure myBox = computeFigure(Figure () {
+      return box(text("size is <n>"), size(n), resizable(false)); });
+   return vcat([ hcat([mySlider, myText],
+      left(), top(), resizable(false)), myBox]);
 }
