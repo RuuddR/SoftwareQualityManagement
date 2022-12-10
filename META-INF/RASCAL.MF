@@ -1,5 +1,5 @@
 Manifest-Version: 0.0.1
-Project-Name: practicum
+Project-Name: SoftwareQualityManagement
 Source: src/main/rascal
 Require-Libraries: 
     
